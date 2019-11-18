@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { graphql } from "react-apollo";
-import * as compose from 'lodash.flowright';
-import { getAuthorsQuery, addBookMutation } from "../../queries/queries";
+import * as compose from "lodash.flowright";
+import {
+  getAuthorsQuery,
+  getBooksQuery,
+  addBookMutation
+} from "../../queries/queries";
 
-const initialState = { name: "", genre: "", author: "" };
+const initialState = { name: "", genre: "", authorId: "" };
 
 const AddBook = ({
   getAuthorsQuery: { loading, authors },
-  addBookMutation,
-  addBookMutationResult
+  addBookMutation
 }) => {
   const [fields, setFields] = useState(initialState);
 
@@ -16,15 +19,23 @@ const AddBook = ({
     setFields({ ...fields, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    addBookMutation({ // TODO
-      variables: fields
+
+    await addBookMutation({
+      variables: fields,
+      refetchQueries: [
+        {
+          query: getBooksQuery
+        }
+      ]
     });
+    setFields(initialState);
   };
 
   return (
     <form id="add-book" onSubmit={handleSubmit}>
+      <h1>Add New Book</h1>
       <div className="field">
         <label htmlFor="name">Book name:</label>
         <input
@@ -51,15 +62,18 @@ const AddBook = ({
         <label htmlFor="author">Author: </label>
         <select
           id="author"
-          value={fields.author}
+          value={fields.authorId}
           onChange={handleChange}
-          name="author"
+          name="authorId"
         >
           {loading && (
             <option value="" disabled>
               Loading authors..
             </option>
           )}
+
+          <option defaultValue="">Select author</option>
+
           {!loading &&
             authors.map(a => (
               <option key={a.id} value={a.id}>
