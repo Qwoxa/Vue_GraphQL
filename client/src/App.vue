@@ -1,23 +1,26 @@
 <template>
   <div id="app">
-    <BooksList :showDetails="setBookId" />
-    <BookDetails :bookId="bookId" />
+    <BooksList @showDetails="setBookId($event)" />
+    <BookDetails v-if="bookId" :bookId="bookId" />
+    <AddBook />
   </div>
 </template>
 
 <script>
 import BooksList from "./components/BooksList";
 import BookDetails from "./components/BookDetails";
+import AddBook from "./components/AddBook";
 
 export default {
   name: "app",
   components: {
     BooksList,
-    BookDetails
+    BookDetails,
+    AddBook
   },
   data() {
     return {
-      bookId: "5dd12687ee80110b80c01568",
+      bookId: "",
       setBookId(newBookId) {
         this.bookId = newBookId;
       }

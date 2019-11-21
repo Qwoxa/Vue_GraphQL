@@ -4,28 +4,36 @@
       class="book-item"
       v-for="book in books"
       :key="book.id"
-      @click="showDetails(book.id)"
+      @click="setToShow(book.id)"
     >{{ book.name }}</div>
   </div>
 </template>
 
 
 <script>
-import { getBooks } from "../queries";
+import { getBooks } from "../graphql";
+
 export default {
+  apollo: {
+    books: {
+      query: getBooks
+    }
+  },
   props: {
     showDetails: {
       type: Function,
       required: true
     }
   },
-  apollo: {
-    books: getBooks
-  },
   data() {
     return {
       books: []
     };
+  },
+  methods: {
+    setToShow(newValue) {
+      this.$emit("showDetails", newValue);
+    }
   }
 };
 </script>
